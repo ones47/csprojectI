@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Validated Login Form</title>
+	<title>Index</title>
 	<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -22,9 +22,14 @@
 	<!-- Login Form Start-->
 	<div class="container">
 		<h1 class="label">Login</h1>
-		<form class="login_form" action="home.html" method="post" name="form" onsubmit="return validated()">
+		<form class="login_form" action="login.php" method="post" name="form" onsubmit="return validated()">
+			<?php
+			if (isset($_GET['error'])) {
+			echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['error']) . '</div>';
+			}
+			?>
 			<div class="font">Username:</div>
-			<input autocomplete="off" type="text" name="email">
+			<input autocomplete="off" type="text" name="username">
 			<div id="email_error">Please fill up with your username</div>
 			<div class="font font2">Password:</div>
 			<input type="password" name="password">
@@ -35,6 +40,5 @@
 	<!-- Login Form End-->
 	<!-- Footer Start-->
 	<!-- Footer End-->
-	<script src="js/valid.js"></script>
 </body>
 </html>
