@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     //$_SESSION["username"] = $username;
                     
                     // Redirect user to dashboard page
-                    header("location: dashboard.php");
+                    header("location: admin_dashboard.php");
                     exit;
                 } else {
                     // Password is not valid

@@ -1,0 +1,131 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.topbar {
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    border-bottom: 2px solid #fff;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.logo {
+    width: 50px;
+    margin-right: 10px;
+}
+
+.school-name {
+    font-size: 1.2em;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    padding-right: 20px;
+}
+
+    .topbar-right a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px;
+    }
+
+.sidebar {
+    width: 250px;
+    height: 100%;
+    background-color: black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+    padding-top: 50px; /* Adjust to add space for the topbar */
+    z-index: 999;
+}
+
+#list-container {
+    padding: 20px;
+}
+
+    #list-container ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+        #list-container ul li {
+            padding: 10px 0;
+        }
+
+.main {
+    margin-left: 250px; /* Adjust this value to match the width of the sidebar */
+    margin-top: 50px; /* Adjust to add space for the topbar */
+    padding: 20px;
+    width: calc(100% - 250px);
+    height: calc(100vh - 50px); /* Adjust height to subtract the topbar height */
+    overflow: auto;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    margin-top: 150px; /* Adjust this value to add more space below the topbar */
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    button:hover {
+        background-color: #45a049;
+    }
