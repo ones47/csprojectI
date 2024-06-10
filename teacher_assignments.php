@@ -13,10 +13,6 @@
             <img src="img/logo.png" alt="School Logo" class="logo">
             <span class="school-name">St Charles Lwanga</span>
         </div>
-        <div class="topbar-right">
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </div>
     </div>
     <!-- Topbar End-->
     <div class="sidebar" id="mySidebar">

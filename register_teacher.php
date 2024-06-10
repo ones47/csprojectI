@@ -2,31 +2,51 @@
 // Include the database connection file
 include 'db_connect.php';
 
-// Retrieve form data
-$username = $_POST['username'];
-$fname = $_POST['fname'];
-$lname = $_POST['lname'];
-$password = $_POST['password'];
-$designation = $_POST['designation'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data
+    $username = $_POST['username'] ?? null;
+    $fname = $_POST['fname'] ?? null;
+    $lname = $_POST['lname'] ?? null;
+    $password = $_POST['password'] ?? null;
+    $designation = $_POST['designation'] ?? null;
 
-// Hash the password for security
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    // Check if any required field is missing
+    if ($username && $fname && $lname && $password && $designation) {
+        // Hash the password for security
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-// SQL query to insert data into the users table
-$sql = "INSERT INTO users (username, fname, lname, password, designation) VALUES ('$username', '$fname', '$lname', '$hashed_password', '$designation')";
+        // Prepare SQL query to insert data into the users table
+        $sql = "INSERT INTO users (username, fname, lname, password, designation) VALUES (?, ?, ?, ?, ?)";
 
-// Execute the query
-if (mysqli_query($conn, $sql)) {
-    echo "User added successfully!";
+        // Initialize prepared statement
+        $stmt = mysqli_prepare($conn, $sql);
+
+        if ($stmt) {
+            // Bind parameters
+            mysqli_stmt_bind_param($stmt, "sssss", $username, $fname, $lname, $hashed_password, $designation);
+
+            // Execute the statement
+            if (mysqli_stmt_execute($stmt)) {
+                echo "User added successfully!";
+            } else {
+                echo "Error: " . mysqli_stmt_error($stmt);
+            }
+
+            // Close the statement
+            mysqli_stmt_close($stmt);
+        } else {
+            echo "Error preparing statement: " . mysqli_error($conn);
+        }
+    } else {
+        echo "All fields are required.";
+    }
+
+    // Close the database connection
+    mysqli_close($conn);
 } else {
-    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    echo "Invalid request method.";
 }
-
-// Close the database connection
-mysqli_close($conn);
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,10 +61,6 @@ mysqli_close($conn);
         <div class="topbar-left">
             <img src="img/logo.png" alt="School Logo" class="logo">
             <span class="school-name">St Charles Lwanga</span>
-        </div>
-        <div class="topbar-right">
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
         </div>
     </div>
     <!-- Topbar End-->
