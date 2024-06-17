@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if (!empty($username) && !empty($password)) {
         // Prepare and bind
-        $stmt = $conn->prepare("SELECT staffID, username, password FROM users WHERE username = ?");
+        $stmt = $conn->prepare("SELECT staffID, username, password, designation FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         
         // Execute the statement
@@ -19,22 +19,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Check if username exists, if yes then verify password
         if ($stmt->num_rows == 1) {
-            $stmt->bind_result($id, $username, $stored_password);
+            $stmt->bind_result($id, $username, $stored_password, $designation);
             if ($stmt->fetch()) {
-                // Compare passwords
-                if ($password === $stored_password) { // This is where the comparison is made
+                // Verify hashed password
+                if (password_verify($password, $stored_password)) {
                     // Password is correct, start a new session
                     $_SESSION["loggedin"] = true;
                     $_SESSION["staffID"] = $id;
                     $_SESSION["username"] = $username;
-                //if (password_verify($password, $hashed_password)) {
-                    // Password is correct, start a new session
-                    //$_SESSION["loggedin"] = true;
-                    //$_SESSION["staffID"] = $id;
-                    //$_SESSION["username"] = $username;
-                    
-                    // Redirect user to dashboard page
-                    header("location: admin_dashboard.php");
+                    $_SESSION["designation"] = $designation;
+
+                    // Redirect based on designation
+                    if ($designation == 'administrator') {
+                        header("location: admin_dashboard.php");
+                    } elseif ($designation == 'teacher') {
+                        header("location: teacher/dashboard.php");
+                    }
                     exit;
                 } else {
                     // Password is not valid
