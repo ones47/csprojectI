@@ -79,28 +79,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <div class="main" id="mainContent">
-        <h2>Add User</h2>
-        <form action="register_teacher.php" method="POST">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required><br><br>
+        <div class="container">
+            <h2>Add User</h2>
+            <form action="register_teacher.php" method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
 
-            <label for="fname">First Name:</label>
-            <input type="text" id="fname" name="fname" required><br><br>
+                <div class="form-group">
+                    <label for="fname">First Name:</label>
+                    <input type="text" id="fname" name="fname" required>
+                </div>
 
-            <label for="lname">Last Name:</label>
-            <input type="text" id="lname" name="lname" required><br><br>
+                <div class="form-group">
+                    <label for="lname">Last Name:</label>
+                    <input type="text" id="lname" name="lname" required>
+                </div>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br><br>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
 
-            <label for="designation">Designation:</label>
-            <select id="designation" name="designation" required>
-                <option value="administrator">Administrator</option>
-                <option value="teacher">Teacher</option>
-            </select><br><br>
+                <div class="form-group">
+                    <label for="designation">Designation:</label>
+                    <select id="designation" name="designation" required>
+                        <option value="administrator">Administrator</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
 
-            <input type="submit" value="Add User">
-        </form>
+                <button type="submit">Add User</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

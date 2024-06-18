@@ -83,40 +83,42 @@ mysqli_close($conn);
     </div>
 
     <div class="main" id="mainContent">
-        <h2>Class List</h2>
+        <div class="container">
+            <h2>Class List</h2>
         
-        <!-- Class Year Buttons -->
-        <div>
-            <?php foreach ($class_years as $year): ?>
-                <button onclick="window.location.href='class_details.php?class=<?= htmlspecialchars($year['classID']) ?>'">
-                    <?= htmlspecialchars($year['classID']) ?>
-                </button>
-            <?php endforeach; ?>
-        </div>
+            <!-- Class Year Buttons -->
+            <div>
+                <?php foreach ($class_years as $year): ?>
+                    <button onclick="window.location.href='class_details.php?class=<?= htmlspecialchars($year['classID']) ?>'">
+                        <?= htmlspecialchars($year['classID']) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
 
-        <!-- Students List -->
-        <table border="1">
-            <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Class</th>
-                <th>Date of Birth</th>
-            </tr>
-            <?php foreach ($students as $student): ?>
+            <!-- Students List -->
+            <table border="1">
                 <tr>
-                    <td><?= htmlspecialchars($student['fname']) ?></td>
-                    <td><?= htmlspecialchars($student['lname']) ?></td>
-                    <td><?= htmlspecialchars($student['class']) ?></td>
-                    <td><?= htmlspecialchars($student['dob']) ?></td>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Class</th>
+                    <th>Date of Birth</th>
                 </tr>
-            <?php endforeach; ?>
-        </table>
+                <?php foreach ($students as $student): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($student['fname']) ?></td>
+                        <td><?= htmlspecialchars($student['lname']) ?></td>
+                        <td><?= htmlspecialchars($student['class']) ?></td>
+                        <td><?= htmlspecialchars($student['dob']) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
         
-        <!-- Download PDF Button -->
-        <form action="generate_pdf.php" method="post">
-            <input type="hidden" name="class" value="<?= htmlspecialchars($selected_class) ?>">
-            <input type="submit" value="Download PDF">
-        </form>
+            <!-- Download PDF Button -->
+            <form action="generate_pdf.php" method="post">
+                <input type="hidden" name="class" value="<?= htmlspecialchars($selected_class) ?>">
+                <input type="submit" value="Download PDF">
+            </form>
+        </div>
     </div>
 </body>
 </html>

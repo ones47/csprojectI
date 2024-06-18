@@ -61,13 +61,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <div class="main" id="mainContent">
-        <h2>Create Class</h2>
-        <form action="create_class.php" method="POST">
-            <label for="class_id">Class:</label>
-            <input type="text" id="class_id" name="class_id" required><br><br>
-
-            <input type="submit" value="Add Class">
-        </form>
+        <div class="container">
+            <h2>Create Class</h2>
+            <form action="create_class.php" method="POST">
+                <div class="form-group">
+                    <label for="class_id">Class:</label>
+                    <input type="text" id="class_id" name="class_id" required>
+                </div>
+                <button type="submit">Add Class</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

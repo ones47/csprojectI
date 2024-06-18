@@ -31,74 +31,82 @@
 
     <div class="main" id="mainContent">
         <!-- Add your main content here -->
-        <h2>Assign Teacher</h2>
-        <form action="teacher_assignments.php" method="POST">
-            <label for="username">Username:</label>
-            <select id="username" name="username" required>
-                <?php
-                // Include the database connection file
-                include 'db_connect.php';
+        <div class="container">
+            <h2>Assign Teacher</h2>
+            <form action="teacher_assignments.php" method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <select id="username" name="username" required>
+                        <?php
+                        // Include the database connection file
+                        include 'db_connect.php';
 
-                // Fetch the list of teachers
-                $result = mysqli_query($conn, "SELECT username FROM users WHERE designation = 'teacher'");
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<option value='" . $row['username'] . "'>" . $row['username'] . "</option>";
+                        // Fetch the list of teachers
+                        $result = mysqli_query($conn, "SELECT username FROM users WHERE designation = 'teacher'");
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<option value='" . $row['username'] . "'>" . $row['username'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="classID">Class ID:</label>
+                    <select id="classID" name="classID" required>
+                        <?php
+                        // Fetch the list of class IDs
+                        $result = mysqli_query($conn, "SELECT classID FROM classes");
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<option value='" . $row['classID'] . "'>" . $row['classID'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject:</label>
+                    <input type="text" id="subject" name="subject" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="class_teacher">Class Teacher:</label>
+                    <select id="class_teacher" name="class_teacher" required>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <button type="submit">Assign Teacher</button>
+            </form>
+
+            <?php
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                // Retrieve form data
+                $username = $_POST['username'];
+                $classID = $_POST['classID'];
+                $subject = $_POST['subject'];
+                $class_teacher = $_POST['class_teacher'];
+
+                // Find the staffID of the selected username
+                $result = mysqli_query($conn, "SELECT staffID FROM users WHERE username = '$username'");
+                $row = mysqli_fetch_assoc($result);
+                $staffID = $row['staffID'];
+
+                // SQL query to insert data into the teacher_assignments table
+                $sql = "INSERT INTO teacher_assignments (staffID, classID, subject, class_teacher) VALUES ('$staffID', '$classID', '$subject', '$class_teacher')";
+
+                // Execute the query
+                if (mysqli_query($conn, $sql)) {
+                    echo "Teacher assigned successfully!";
+                } else {
+                    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
                 }
-                ?>
-            </select><br><br>
 
-            <label for="classID">Class ID:</label>
-            <select id="classID" name="classID" required>
-                <?php
-                // Fetch the list of class IDs
-                $result = mysqli_query($conn, "SELECT classID FROM classes");
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<option value='" . $row['classID'] . "'>" . $row['classID'] . "</option>";
-                }
-                ?>
-            </select><br><br>
-
-            <label for="subject">Subject:</label>
-            <input type="text" id="subject" name="subject" required><br><br>
-
-            <label for="class_teacher">Class Teacher:</label>
-            <select id="class_teacher" name="class_teacher" required>
-                <option value="1">Yes</option>
-                <option value="0">No</option>
-            </select><br><br>
-
-
-            <input type="submit" value="Assign Teacher">
-        </form>
-
-        <?php
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Retrieve form data
-            $username = $_POST['username'];
-            $classID = $_POST['classID'];
-            $subject = $_POST['subject'];
-            $class_teacher = $_POST['class_teacher'];
-
-            // Find the staffID of the selected username
-            $result = mysqli_query($conn, "SELECT staffID FROM users WHERE username = '$username'");
-            $row = mysqli_fetch_assoc($result);
-            $staffID = $row['staffID'];
-
-            // SQL query to insert data into the teacher_assignments table
-            $sql = "INSERT INTO teacher_assignments (staffID, classID, subject, class_teacher) VALUES ('$staffID', '$classID', '$subject', '$class_teacher')";
-
-            // Execute the query
-            if (mysqli_query($conn, $sql)) {
-                echo "Teacher assigned successfully!";
-            } else {
-                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+                // Close the database connection
+                mysqli_close($conn);
             }
-
-            // Close the database connection
-            mysqli_close($conn);
-        }
-        ?>
-    </div>
+            ?>
+        </div>
     </div>
 </body>
 </html>

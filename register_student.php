@@ -59,31 +59,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
     <div class="main" id="mainContent">
         <!-- Add your main content here -->
         <div class="container">
-        <h2>Register Student</h2>
-        <form action="register_student.php" method="POST">
-            <input type="hidden" name="register_student" value="1">
-            <div class="form-group">
-                <label for="first_name">First Name:</label>
-                <input type="text" id="first_name" name="first_name" required>
-            </div>
-            <div class="form-group">
-                <label for="last_name">Last Name:</label>
-                <input type="text" id="last_name" name="last_name" required>
-            </div>
-            <div class="form-group">
-                <label for="class">Class (Year of Graduation):</label>
-                <input type="text" id="class" name="class" required>
-            </div>
-            <div class="form-group">
-                <label for="parent_contacts">Parent Contacts (Phone Number):</label>
-                <input type="text" id="parent_contacts" name="parent_contacts" required>
-            </div>
-            <div class="form-group">
-                <label for="dob">Date of Birth:</label>
-                <input type="date" id="dob" name="dob" required>
-            </div>
-            <button type="submit">Register Student</button>
-        </form>
+            <h2>Register Student</h2>
+            <form action="register_student.php" method="POST">
+                <input type="hidden" name="register_student" value="1">
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="class">Class (Year of Graduation):</label>
+                    <input type="text" id="class" name="class" required>
+                </div>
+                <div class="form-group">
+                    <label for="parent_contacts">Parent Contacts (Phone Number):</label>
+                    <input type="text" id="parent_contacts" name="parent_contacts" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+                <button type="submit">Register Student</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
