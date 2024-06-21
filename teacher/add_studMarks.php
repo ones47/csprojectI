@@ -30,45 +30,6 @@ function fetchClasses($conn, $staffID) {
     return $classes;
 }
 
-// Function to fetch students based on classes assigned to the teacher
-function fetchStudents($conn, $classIDs) {
-    $students = [];
-    if (!empty($classIDs)) {
-        $studentIDQuery = "SELECT studentID FROM class_students WHERE classID IN ($classIDs)";
-        $studentIDResult = $conn->query($studentIDQuery);
-        if ($studentIDResult) {
-            $studentIDs = [];
-            while ($row = $studentIDResult->fetch_assoc()) {
-                $studentIDs[] = $row['studentID'];
-            }
-            $studentIDs = implode(',', $studentIDs);
-            $studentQuery = "SELECT studentID, student_Fname, student_Lname FROM students WHERE studentID IN ($studentIDs)";
-            $studentResult = $conn->query($studentQuery);
-            if ($studentResult) {
-                while ($row = $studentResult->fetch_assoc()) {
-                    $students[] = $row;
-                }
-            }
-        }
-    }
-    return $students;
-}
-
-// Function to fetch subjects assigned to the logged-in teacher
-function fetchSubjects($conn, $staffID) {
-    $subjects = [];
-    $subjectQuery = "SELECT DISTINCT subject FROM teacher_assignments WHERE staffID = ?";
-    $stmt = $conn->prepare($subjectQuery);
-    $stmt->bind_param("i", $staffID);
-    $stmt->execute();
-    $subjectResult = $stmt->get_result();
-    while ($row = $subjectResult->fetch_assoc()) {
-        $subjects[] = $row['subject'];
-    }
-    $stmt->close();
-    return $subjects;
-}
-
 // Function to fetch test types assigned to the logged-in teacher
 function fetchTests($conn, $staffID) {
     $testQuery = "SELECT testID, testName FROM tests WHERE staffID = ?";
@@ -90,10 +51,6 @@ function fetchTests($conn, $staffID) {
 
 // Fetch data
 $classes = fetchClasses($conn, $staffID);
-$classIDs = implode(',', $classes); // For use in student query
-
-$students = fetchStudents($conn, $classIDs);
-$subjects = fetchSubjects($conn, $staffID);
 $tests = fetchTests($conn, $staffID);
 
 // Close database connection
@@ -127,21 +84,18 @@ $conn->close();
                 <!-- Add more list items if needed -->
             </ul>
         </div>
+        <div class="logout-button-container">
+            <form action="../logout.php" method="POST">
+                <button type="submit">LOG OUT</button>
+            </form>
+        </div>
     </div>
 
     <div class="main" id="mainContent">
         <!-- Add your main content here -->
         <div class="container">
             <h2>Add Student Marks</h2>
-            <form action="submit_marks.php" method="POST">
-                <div class="form-group">
-                    <label for="studentID">Student Name:</label>
-                    <select name="studentID" id="studentID" required>
-                        <?php foreach($students as $student): ?>
-                            <option value="<?= htmlspecialchars($student['studentID']) ?>"><?= htmlspecialchars($student['student_Fname'] . ' ' . $student['student_Lname']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+            <form action="submit_marks.php" method="GET">
                 <div class="form-group">
                     <label for="classID">Student Class:</label>
                     <select name="classID" id="classID" required>
@@ -151,18 +105,6 @@ $conn->close();
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="subject">Subject:</label>
-                    <select name="subject" id="subject" required>
-                        <?php foreach($subjects as $subject): ?>
-                            <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="grade">Student Grade (0-100):</label>
-                    <input type="number" name="grade" id="grade" min="0" max="100" required>
-                </div>
-                <div class="form-group">
                     <label for="testID">Test Name:</label>
                     <select name="testID" id="testID" required>
                         <?php foreach ($tests as $test): ?>
@@ -170,8 +112,7 @@ $conn->close();
                         <?php endforeach; ?>
                     </select>
                 </div>
-
-                <button type="submit">Submit</button>
+                <button type="submit">Next</button>
             </form>
         </div>
     </div>

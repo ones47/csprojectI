@@ -27,6 +27,11 @@
                 <!-- Add more list items if needed -->
             </ul>
         </div>
+        <div class="logout-button-container">
+            <form action="logout.php" method="POST">
+                <button type="submit">LOG OUT</button>
+            </form>
+        </div>
     </div>
 
     <div class="main" id="mainContent">
