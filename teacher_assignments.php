@@ -70,7 +70,15 @@
 
                 <div class="form-group">
                     <label for="subject">Subject:</label>
-                    <input type="text" id="subject" name="subject" required>
+                    <select id="subject" name="subject" required>
+                        <?php
+                        // Fetch the list of subjects
+                        $result = mysqli_query($conn, "SELECT subjectID, subjectName FROM subjects");
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<option value='" . $row['subjectID'] . "'>" . $row['subjectName'] . "</option>";
+                        }
+                        ?>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -84,21 +92,21 @@
                 <button type="submit">Assign Teacher</button>
             </form>
 
-            <?php
-            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                // Retrieve form data
-                $username = $_POST['username'];
-                $classID = $_POST['classID'];
-                $subject = $_POST['subject'];
-                $class_teacher = $_POST['class_teacher'];
+        <?php
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // Retrieve form data
+            $username = $_POST['username'];
+            $classID = $_POST['classID'];
+            $subject = $_POST['subject'];
+            $class_teacher = $_POST['class_teacher'];
 
                 // Find the staffID of the selected username
                 $result = mysqli_query($conn, "SELECT staffID FROM users WHERE username = '$username'");
                 $row = mysqli_fetch_assoc($result);
                 $staffID = $row['staffID'];
 
-                // SQL query to insert data into the teacher_assignments table
-                $sql = "INSERT INTO teacher_assignments (staffID, classID, subject, class_teacher) VALUES ('$staffID', '$classID', '$subject', '$class_teacher')";
+            // SQL query to insert data into the teacher_assignments table
+            $sql = "INSERT INTO teacher_assignments (staffID, classID, subject, class_teacher) VALUES ('$staffID', '$classID', '$subject', '$class_teacher')";
 
                 // Execute the query
                 if (mysqli_query($conn, $sql)) {

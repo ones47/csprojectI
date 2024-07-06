@@ -18,8 +18,6 @@
 			<a href="contact.html">Contact</a>
 		</div>
 	</div>
-	<!-- Topbar End-->
-	<!-- Login Form Start-->
 	<div class="container">
 		<h1 class="label">Login</h1>
 		<form class="login_form" action="login.php" method="post" name="form" onsubmit="return validated()">
@@ -37,8 +35,5 @@
 			<button type="submit">LOGIN</button>
 		</form>
 	</div>
-	<!-- Login Form End-->
-	<!-- Footer Start-->
-	<!-- Footer End-->
 </body>
 </html>

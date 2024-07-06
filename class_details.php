@@ -2,8 +2,8 @@
 // Include the database connection file
 include 'db_connect.php';
 
-// Fetch distinct class years from the class_students table
-$class_years_query = "SELECT DISTINCT classID FROM class_students ORDER BY classID ASC";
+// Fetch distinct class years from the students table
+$class_years_query = "SELECT DISTINCT classID FROM students ORDER BY classID ASC";
 $class_years_result = mysqli_query($conn, $class_years_query);
 
 // Check for errors in the query
@@ -15,38 +15,45 @@ if (!$class_years_result) {
 $class_years = mysqli_fetch_all($class_years_result, MYSQLI_ASSOC);
 
 // Fetch students based on selected class year
-$selected_class = $_GET['class'] ?? $class_years[0]['classID'];
+$selected_class = $_GET['class'] ?? ($class_years[0]['classID'] ?? null);
 
-$students_query = "
-SELECT 
-    s.student_Fname AS fname, 
-    s.student_Lname AS lname, 
-    c.classID AS class, 
-    s.dob 
-FROM 
-    students s
-JOIN 
-    class_students c ON s.studentID = c.studentID
-WHERE 
-    c.classID = ?
-ORDER BY 
-    s.student_Fname ASC, s.student_Lname ASC";
+if ($selected_class) {
+    $students_query = "
+    SELECT 
+        studentID, 
+        fname, 
+        lname, 
+        classID, 
+        contacts, 
+        dob 
+    FROM 
+        students
+    WHERE 
+        classID = ?
+    ORDER BY 
+        fname ASC, lname ASC";
 
-$stmt = mysqli_prepare($conn, $students_query);
-mysqli_stmt_bind_param($stmt, "s", $selected_class);
-mysqli_stmt_execute($stmt);
-$students_result = mysqli_stmt_get_result($stmt);
+    $stmt = mysqli_prepare($conn, $students_query);
+    mysqli_stmt_bind_param($stmt, "i", $selected_class);
+    mysqli_stmt_execute($stmt);
+    $students_result = mysqli_stmt_get_result($stmt);
 
-// Check for errors in the query
-if (!$students_result) {
-    die("Query failed: " . mysqli_error($conn));
+    // Check for errors in the query
+    if (!$students_result) {
+        die("Query failed: " . mysqli_error($conn));
+    }
+
+    // Fetch all rows
+    $students = mysqli_fetch_all($students_result, MYSQLI_ASSOC);
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+} else {
+    // Handle case where no class is selected
+    $students = [];
 }
 
-// Fetch all rows
-$students = mysqli_fetch_all($students_result, MYSQLI_ASSOC);
-
 // Close the database connection
-mysqli_stmt_close($stmt);
 mysqli_close($conn);
 ?>
 
@@ -90,7 +97,7 @@ mysqli_close($conn);
     <div class="main" id="mainContent">
         <div class="container">
             <h2>Class List</h2>
-        
+
             <!-- Class Year Buttons -->
             <div>
                 <?php foreach ($class_years as $year): ?>

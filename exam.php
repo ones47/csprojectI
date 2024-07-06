@@ -22,12 +22,12 @@ while ($row = mysqli_fetch_assoc($teacher_result)) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $test_name = $_POST['test_name'] ?? null;
     $class_id = $_POST['class_id'] ?? null;
-    $subject = $_POST['subject'] ?? null;
     $teacher_username = $_POST['teacher_username'] ?? null;
-    $test_type = $_POST['test_type'] ?? null;
+    $term = $_POST['term'] ?? null;
+    $yearOfTest = $_POST['yearOfTest'] ?? null;
 
     // Validate all fields are filled
-    if ($test_name && $class_id && $subject && $teacher_username && $test_type) {
+    if ($test_name && $class_id && $teacher_username && $term && $yearOfTest) {
         // Get the staffID for the selected teacher
         $staff_query = "SELECT staffID FROM users WHERE username = ?";
         $stmt = $conn->prepare($staff_query);
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Add Test</title>
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -116,11 +116,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="form-group">
-                    <label for="subject">Subject:</label>
-                    <input type="text" id="subject" name="subject" required>
-                </div>
-
-                <div class="form-group">
                     <label for="teacher_username">Assigned Teacher:</label>
                     <select id="teacher_username" name="teacher_username" required>
                         <?php foreach ($teachers as $username) : ?>
@@ -130,12 +125,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="form-group">
-                    <label for="test_type">Test Type:</label>
-                    <select id="test_type" name="test_type" required>
-                        <option value="quiz">Quiz</option>
-                        <option value="exam">Exam</option>
+                    <label for="term">Term:</label>
+                    <select id="term" name="term" required>
+                        <option value="1">Term 1</option>
+                        <option value="2">Term 2</option>
+                        <option value="3">Term 3</option>
                     </select>
                 </div>
+
+            <label for="test_type">Test Type:</label>
+            <select id="test_type" name="test_type" required>
+                <option value="quiz">Quiz</option>
+                <option value="exam">Exam</option>
+            </select><br><br>
 
                 <button type="submit">Add Test</button>
             </form>

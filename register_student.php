@@ -1,6 +1,21 @@
 <?php
 include 'db_connect.php';
 
+// Fetching class data from the database
+$sql_classes = "SELECT classID FROM classes ORDER BY classID ASC";
+$result_classes = $conn->query($sql_classes);
+
+$class_options = "";
+if ($result_classes->num_rows > 0) {
+    while ($row = $result_classes->fetch_assoc()) {
+        $classID = $row['classID'];
+        // You can customize the option label as needed, for example, using the classID
+        $class_options .= "<option value='$classID'>$classID</option>";
+    }
+} else {
+    echo "No classes found";
+}
+
 // Handle form submission for registering students
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
     $first_name = $_POST['first_name'];
@@ -9,21 +24,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
     $parent_contacts = $_POST['parent_contacts'];
     $dob = $_POST['dob'];
 
-    $sql = "INSERT INTO students (student_Fname, student_Lname, classID, parent_contacts, dob) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO students (fname, lname, classID, contacts, dob) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssiss", $first_name, $last_name, $class, $parent_contacts, $dob);
 
     if ($stmt->execute()) {
         echo "New student registered successfully";
-        header("location: assign_class.php");
-        exit;
+        // Redirect to another page if needed
+        // header("location: assign_class.php");
+        // exit;
     } else {
         echo "Error: " . $stmt->error;
     }
 
     $stmt->close();
-    $conn->close();
 }
+
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,7 +94,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
                 </div>
                 <div class="form-group">
                     <label for="class">Class (Year of Graduation):</label>
-                    <input type="text" id="class" name="class" required>
+                    <select id="class" name="class" required>
+                        <?php echo $class_options; ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="parent_contacts">Parent Contacts (Phone Number):</label>

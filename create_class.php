@@ -8,18 +8,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Validate that class ID is provided
     if ($class_id) {
-        // Insert data into the classes table
-        $insert_query = "INSERT INTO classes (classID) VALUES (?)";
-        $stmt = mysqli_prepare($conn, $insert_query);
-        mysqli_stmt_bind_param($stmt, "s", $class_id);
+        // Check if the class ID already exists
+        $check_query = "SELECT COUNT(*) FROM classes WHERE classID = ?";
+        $stmt_check = mysqli_prepare($conn, $check_query);
+        mysqli_stmt_bind_param($stmt_check, "s", $class_id);
+        mysqli_stmt_execute($stmt_check);
+        mysqli_stmt_bind_result($stmt_check, $count);
+        mysqli_stmt_fetch($stmt_check);
+        mysqli_stmt_close($stmt_check);
 
-        if (mysqli_stmt_execute($stmt)) {
-            echo "Class added successfully!";
+        if ($count > 0) {
+            echo "Error: Class ID already exists.";
         } else {
-            echo "Error: " . mysqli_stmt_error($stmt);
-        }
+            // Insert data into the classes table
+            $insert_query = "INSERT INTO classes (classID) VALUES (?)";
+            $stmt_insert = mysqli_prepare($conn, $insert_query);
+            mysqli_stmt_bind_param($stmt_insert, "s", $class_id);
 
-        mysqli_stmt_close($stmt);
+            if (mysqli_stmt_execute($stmt_insert)) {
+                echo "Class added successfully!";
+            } else {
+                echo "Error: " . mysqli_stmt_error($stmt_insert);
+            }
+
+            mysqli_stmt_close($stmt_insert);
+        }
     } else {
         echo "Class ID is required.";
     }
@@ -53,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <li><a href="register_student.php">Add Students</a></li>
                 <li><a href="register_teacher.php">Add Teachers</a></li>
                 <li><a href="teacher_assignments.php">Assign Teacher</a></li>
-                <li><a href="create_class.php">Create Class</a></li>
+                <li><a href="exam.php">Add Exam</a></li>
                 <li><a href="class_details.php">View Class</a></li>
                 <!-- Add more list items if needed -->
             </ul>
