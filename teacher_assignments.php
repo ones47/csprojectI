@@ -39,10 +39,80 @@
                 // Include the database connection file
                 include 'db_connect.php';
 
+<<<<<<< Updated upstream
                 // Fetch the list of teachers
                 $result = mysqli_query($conn, "SELECT username FROM users WHERE designation = 'teacher'");
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<option value='" . $row['username'] . "'>" . $row['username'] . "</option>";
+=======
+                        // Fetch the list of teachers
+                        $result = mysqli_query($conn, "SELECT username FROM users WHERE designation = 'teacher'");
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<option value='" . $row['username'] . "'>" . $row['username'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="classID">Class ID:</label>
+                    <select id="classID" name="classID" required>
+                        <?php
+                        // Fetch the list of class IDs
+                        $result = mysqli_query($conn, "SELECT classID FROM classes");
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<option value='" . $row['classID'] . "'>" . $row['classID'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject:</label>
+                    <select id="subject" name="subject" required>
+                        <?php
+                        // Fetch the list of subjects
+                        $result = mysqli_query($conn, "SELECT subjectID, subjectName FROM subjects");
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<option value='" . $row['subjectID'] . "'>" . $row['subjectName'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="class_teacher">Class Teacher:</label>
+                    <select id="class_teacher" name="class_teacher" required>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <button type="submit">Assign Teacher</button>
+            </form>
+
+            <?php
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                // Retrieve form data
+                $username = $_POST['username'];
+                $classID = $_POST['classID'];
+                $subjectID = $_POST['subject']; // Updated to subjectID
+                $class_teacher = $_POST['class_teacher'];
+
+                // Find the staffID of the selected username
+                $result = mysqli_query($conn, "SELECT staffID FROM users WHERE username = '$username'");
+                $row = mysqli_fetch_assoc($result);
+                $staffID = $row['staffID'];
+
+                // SQL query to insert data into the teacher_assignments table
+                $sql = "INSERT INTO teacher_assignment (staffID, classID, subjectID, classteacher) VALUES ('$staffID', '$classID', '$subjectID', '$class_teacher')";
+
+                // Execute the query
+                if (mysqli_query($conn, $sql)) {
+                    echo "Teacher assigned successfully!";
+                } else {
+                    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+>>>>>>> Stashed changes
                 }
                 ?>
             </select><br><br>

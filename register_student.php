@@ -1,6 +1,21 @@
 <?php
 include 'db_connect.php';
 
+// Fetching class data from the database
+$sql_classes = "SELECT classID FROM classes ORDER BY classID ASC";
+$result_classes = $conn->query($sql_classes);
+
+$class_options = "";
+if ($result_classes->num_rows > 0) {
+    while ($row = $result_classes->fetch_assoc()) {
+        $classID = $row['classID'];
+        // You can customize the option label as needed, for example, using the classID
+        $class_options .= "<option value='$classID'>$classID</option>";
+    }
+} else {
+    echo "No classes found";
+}
+
 // Handle form submission for registering students
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
     $first_name = $_POST['first_name'];
@@ -9,21 +24,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
     $parent_contacts = $_POST['parent_contacts'];
     $dob = $_POST['dob'];
 
-    $sql = "INSERT INTO students (student_Fname, student_Lname, classID, parent_contacts, dob) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO students (fname, lname, classID, contacts, dob) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssiss", $first_name, $last_name, $class, $parent_contacts, $dob);
 
     if ($stmt->execute()) {
         echo "New student registered successfully";
-        header("location: assign_class.php");
-        exit;
+        // Redirect to another page if needed
+        // header("location: assign_class.php");
+        // exit;
     } else {
         echo "Error: " . $stmt->error;
     }
 
     $stmt->close();
-    $conn->close();
 }
+
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,6 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
     <div class="main" id="mainContent">
         <!-- Add your main content here -->
         <div class="container">
+<<<<<<< Updated upstream
         <h2>Register Student</h2>
         <form action="register_student.php" method="POST">
             <input type="hidden" name="register_student" value="1">
@@ -84,6 +102,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register_student'])) {
             </div>
             <button type="submit">Register Student</button>
         </form>
+=======
+            <h2>Register Student</h2>
+            <form action="register_student.php" method="POST">
+                <input type="hidden" name="register_student" value="1">
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="class">Class (Year of Graduation):</label>
+                    <select id="class" name="class" required>
+                        <?php echo $class_options; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="parent_contacts">Parent Contacts (Phone Number):</label>
+                    <input type="text" id="parent_contacts" name="parent_contacts" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+                <button type="submit">Register Student</button>
+            </form>
+        </div>
+>>>>>>> Stashed changes
     </div>
 </body>
 </html>

@@ -22,12 +22,12 @@ while ($row = mysqli_fetch_assoc($teacher_result)) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $test_name = $_POST['test_name'] ?? null;
     $class_id = $_POST['class_id'] ?? null;
-    $subject = $_POST['subject'] ?? null;
     $teacher_username = $_POST['teacher_username'] ?? null;
-    $test_type = $_POST['test_type'] ?? null;
+    $term = $_POST['term'] ?? null;
+    $yearOfTest = $_POST['yearOfTest'] ?? null;
 
     // Validate all fields are filled
-    if ($test_name && $class_id && $subject && $teacher_username && $test_type) {
+    if ($test_name && $class_id && $teacher_username && $term && $yearOfTest) {
         // Get the staffID for the selected teacher
         $staff_query = "SELECT staffID FROM users WHERE username = ?";
         $stmt = mysqli_prepare($conn, $staff_query);
@@ -39,17 +39,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($staffID) {
             // Insert data into the tests table
-            $insert_query = "INSERT INTO tests (testID, classID, subject, staffID, testtype) VALUES (?, ?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $insert_query);
-            $test_id = uniqid(); // Generate a unique ID for the test
-            mysqli_stmt_bind_param($stmt, "sssss", $test_id, $class_id, $subject, $staffID, $test_type);
-            
-            if (mysqli_stmt_execute($stmt)) {
+            $insert_query = "INSERT INTO tests (testName, classID, subject, staffID, testtype) VALUES (?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($insert_query);
+            $stmt->bind_param("sissi", $test_name, $class_id, $subject, $staffID, $test_type);
+
+            if ($stmt->execute()) {
                 echo "Test added successfully!";
             } else {
-                echo "Error: " . mysqli_stmt_error($stmt);
+                echo "Error: " . $stmt->error;
             }
-            mysqli_stmt_close($stmt);
+            $stmt->close();
         } else {
             echo "Error: Teacher not found.";
         }
@@ -67,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Add Test</title>
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
@@ -106,24 +105,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php endforeach; ?>
             </select><br><br>
 
-            <label for="subject">Subject:</label>
-            <input type="text" id="subject" name="subject" required><br><br>
+                <div class="form-group">
+                    <label for="teacher_username">Assigned Teacher:</label>
+                    <select id="teacher_username" name="teacher_username" required>
+                        <?php foreach ($teachers as $username) : ?>
+                            <option value="<?= htmlspecialchars($username) ?>"><?= htmlspecialchars($username) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-            <label for="teacher_username">Assigned Teacher:</label>
-            <select id="teacher_username" name="teacher_username" required>
-                <?php foreach ($teachers as $username) : ?>
-                    <option value="<?= $username ?>"><?= $username ?></option>
-                <?php endforeach; ?>
-            </select><br><br>
+                <div class="form-group">
+                    <label for="term">Term:</label>
+                    <select id="term" name="term" required>
+                        <option value="1">Term 1</option>
+                        <option value="2">Term 2</option>
+                        <option value="3">Term 3</option>
+                    </select>
+                </div>
 
-            <label for="test_type">Test Type:</label>
-            <select id="test_type" name="test_type" required>
-                <option value="quiz">Quiz</option>
-                <option value="exam">Exam</option>
-            </select><br><br>
+                <div class="form-group">
+                    <label for="yearOfTest">Year:</label>
+                    <input type="text" id="yearOfTest" name="yearOfTest" required>
+                </div>
 
-            <input type="submit" value="Add Test">
-        </form>
+                <button type="submit">Add Test</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
