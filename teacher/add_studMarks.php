@@ -3,22 +3,16 @@
 include '../db_connect.php';
 session_start();
 
-// Assume staffID is stored in session after login
+// Check if staffID is stored in session after login
 if (!isset($_SESSION['staffID'])) {
     die("Session error: StaffID not found.");
 }
 $staffID = $_SESSION['staffID'];
 
-// Initialize arrays to store fetched data
-$classes = [];
-$students = [];
-$tests = [];
-$subjects = [];
-
 // Function to fetch classes assigned to the logged-in teacher
 function fetchClasses($conn, $staffID) {
     $classes = [];
-    $classQuery = "SELECT DISTINCT classID FROM teacher_assignments WHERE staffID = ?";
+    $classQuery = "SELECT DISTINCT classID FROM teacher_assignment WHERE staffID = ?";
     $stmt = $conn->prepare($classQuery);
     $stmt->bind_param("i", $staffID);
     $stmt->execute();
@@ -74,11 +68,13 @@ $conn->close();
         </div>
     </div>
     <!-- Topbar End-->
+
     <div class="sidebar" id="mySidebar">
         <div id="list-container">
             <ul>
                 <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="view_studMarks.php">View Student Grades</a></li>
+                <li><a href="add_studMarks.php">Add Students Marks</a></li>
+                <li><a href="view_studMarks.php">View Student Marks</a></li>
                 <li><a href="view_classResults.php">Class Results</a></li>
                 <li><a href="view_classStats.php">Class Statistics</a></li>
                 <!-- Add more list items if needed -->

@@ -12,7 +12,7 @@ $staffID = $_SESSION['staffID'];
 // Fetch classes assigned to the logged-in teacher
 function fetchClasses($conn, $staffID) {
     $classes = [];
-    $classQuery = "SELECT DISTINCT classID FROM teacher_assignments WHERE staffID = ?";
+    $classQuery = "SELECT DISTINCT classID FROM teacher_assignment WHERE staffID = ?";
     $stmt = $conn->prepare($classQuery);
     $stmt->bind_param("i", $staffID);
     $stmt->execute();
@@ -27,31 +27,33 @@ function fetchClasses($conn, $staffID) {
 // Fetch subjects assigned to the logged-in teacher
 function fetchSubjects($conn, $staffID) {
     $subjects = [];
-    $subjectQuery = "SELECT DISTINCT subject FROM teacher_assignments WHERE staffID = ?";
+    $subjectQuery = "SELECT DISTINCT s.subjectID, s.subjectName FROM subjects s
+                     JOIN teacher_assignment ta ON s.subjectID = ta.subjectID
+                     WHERE ta.staffID = ?";
     $stmt = $conn->prepare($subjectQuery);
     $stmt->bind_param("i", $staffID);
     $stmt->execute();
     $subjectResult = $stmt->get_result();
     while ($row = $subjectResult->fetch_assoc()) {
-        $subjects[] = $row['subject'];
+        $subjects[$row['subjectID']] = $row['subjectName'];
     }
     $stmt->close();
     return $subjects;
 }
 
 // Fetch student marks based on classes and subjects assigned to the teacher
-function fetchStudentMarks($conn, $classID, $subject) {
+function fetchStudentMarks($conn, $classID, $subjectID) {
     $students = [];
-    if (!empty($classID) && !empty($subject)) {
+    if (!empty($classID) && !empty($subjectID)) {
         $marksQuery = "
-            SELECT s.student_Fname, s.student_Lname, t.subject, t.grade, c.classID 
-            FROM testresults t
-            JOIN students s ON t.studentID = s.studentID
-            JOIN class_students cs ON s.studentID = cs.studentID
-            JOIN classes c ON cs.classID = c.classID
-            WHERE cs.classID = ? AND t.subject = ?";
+            SELECT s.fname AS student_Fname, s.lname AS student_Lname, sub.subjectName AS subject, r.grade, c.classID 
+            FROM results r
+            JOIN students s ON r.studentID = s.studentID
+            JOIN classes c ON s.classID = c.classID
+            JOIN subjects sub ON r.subjectID = sub.subjectID
+            WHERE s.classID = ? AND r.subjectID = ?";
         $stmt = $conn->prepare($marksQuery);
-        $stmt->bind_param("is", $classID, $subject);
+        $stmt->bind_param("ii", $classID, $subjectID);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
@@ -68,10 +70,10 @@ $subjects = fetchSubjects($conn, $staffID);
 
 // Handle form submission
 $selectedClassID = $_POST['classID'] ?? null;
-$selectedSubject = $_POST['subject'] ?? null;
+$selectedSubjectID = $_POST['subjectID'] ?? null;
 $students = [];
-if ($selectedClassID && $selectedSubject) {
-    $students = fetchStudentMarks($conn, $selectedClassID, $selectedSubject);
+if ($selectedClassID && $selectedSubjectID) {
+    $students = fetchStudentMarks($conn, $selectedClassID, $selectedSubjectID);
 }
 
 // Close database connection
@@ -115,21 +117,30 @@ $conn->close();
         <h2>View Student Marks</h2>
         <form action="view_studMarks.php" method="POST">
             <div class="form-group">
-                <label for="subject">Select Subject:</label>
-                <select name="subject" id="subject" required>
+                <label for="subjectID">Select Subject:</label>
+                <select name="subjectID" id="subjectID" required>
                     <option value="">Select Subject</option>
-                    <?php foreach($subjects as $subject): ?>
-                        <option value="<?= htmlspecialchars($subject) ?>" <?= ($selectedSubject == $subject) ? 'selected' : '' ?>><?= htmlspecialchars($subject) ?></option>
+                    <?php foreach($subjects as $subjectID => $subjectName): ?>
+                        <option value="<?= htmlspecialchars($subjectID) ?>" <?= ($selectedSubjectID == $subjectID) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($subjectName) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="form-group">
-                <label for="classID">Select Class Year:</label>
-                <?php foreach($classes as $classID): ?>
-                    <button type="submit" name="classID" value="<?= htmlspecialchars($classID) ?>" <?= ($selectedClassID == $classID) ? 'selected' : '' ?>><?= htmlspecialchars($classID) ?></button>
-                <?php endforeach; ?>
+                <label for="classID">Select Class:</label>
+                <select name="classID" id="classID" required>
+                    <option value="">Select Class</option>
+                    <?php foreach($classes as $classID): ?>
+                        <option value="<?= htmlspecialchars($classID) ?>" <?= ($selectedClassID == $classID) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($classID) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
+            <button type="submit">View Marks</button>
         </form>
+        
         <?php if (!empty($students)): ?>
             <table border="1" cellspacing="0" cellpadding="10">
                 <thead>
@@ -154,7 +165,7 @@ $conn->close();
                 </tbody>
             </table>
         <?php elseif ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
-            <p>No student marks found for the selected subject and class year.</p>
+            <p>No student marks found for the selected subject and class.</p>
         <?php endif; ?>
     </div>
 </body>

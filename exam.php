@@ -38,17 +38,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
 
         if ($staffID) {
-            // Insert data into the tests table
-            $insert_query = "INSERT INTO tests (testName, classID, subject, staffID, testtype) VALUES (?, ?, ?, ?, ?)";
-            $stmt = $conn->prepare($insert_query);
-            $stmt->bind_param("sissi", $test_name, $class_id, $subject, $staffID, $test_type);
-
-            if ($stmt->execute()) {
-                echo "Test added successfully!";
-            } else {
-                echo "Error: " . $stmt->error;
-            }
+            // Get subjectID based on classID and staffID from teacher_assignment
+            $subject_query = "SELECT subjectID FROM teacher_assignment WHERE classID = ? AND staffID = ?";
+            $stmt = $conn->prepare($subject_query);
+            $stmt->bind_param("ii", $class_id, $staffID);
+            $stmt->execute();
+            $stmt->bind_result($subjectID);
+            $stmt->fetch();
             $stmt->close();
+
+            if ($subjectID) {
+                // Insert data into the tests table
+                $insert_query = "INSERT INTO tests (testName, classID, subjectID, staffID, term, yearOfTest) VALUES (?, ?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($insert_query);
+                $stmt->bind_param("siiiii", $test_name, $class_id, $subjectID, $staffID, $term, $yearOfTest);
+
+                if ($stmt->execute()) {
+                    echo "Test added successfully!";
+                } else {
+                    echo "Error: " . $stmt->error;
+                }
+                $stmt->close();
+            } else {
+                echo "Error: Subject not found for the selected class and teacher.";
+            }
         } else {
             echo "Error: Teacher not found.";
         }
@@ -133,11 +146,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </select>
                 </div>
 
-            <label for="test_type">Test Type:</label>
-            <select id="test_type" name="test_type" required>
-                <option value="quiz">Quiz</option>
-                <option value="exam">Exam</option>
-            </select><br><br>
+                <div class="form-group">
+                    <label for="yearOfTest">Year:</label>
+                    <input type="text" id="yearOfTest" name="yearOfTest" required>
+                </div>
 
                 <button type="submit">Add Test</button>
             </form>

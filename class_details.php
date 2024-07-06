@@ -114,17 +114,19 @@ mysqli_close($conn);
                     <th>Last Name</th>
                     <th>Class</th>
                     <th>Date of Birth</th>
+                    <!-- Add more columns if needed -->
                 </tr>
                 <?php foreach ($students as $student): ?>
                     <tr>
                         <td><?= htmlspecialchars($student['fname']) ?></td>
                         <td><?= htmlspecialchars($student['lname']) ?></td>
-                        <td><?= htmlspecialchars($student['class']) ?></td>
+                        <td><?= htmlspecialchars($student['classID']) ?></td>
                         <td><?= htmlspecialchars($student['dob']) ?></td>
+                        <!-- Add more columns if needed -->
                     </tr>
                 <?php endforeach; ?>
             </table>
-        
+
             <!-- Download PDF Button -->
             <form action="generate_pdf.php" method="post">
                 <input type="hidden" name="class" value="<?= htmlspecialchars($selected_class) ?>">

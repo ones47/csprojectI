@@ -3,26 +3,56 @@
 include '../db_connect.php';
 session_start();
 
-// Assume staffID is stored in session after login
+// staffID is stored in session after login
 if (!isset($_SESSION['staffID'])) {
     die("Session error: StaffID not found.");
 }
 $staffID = $_SESSION['staffID'];
 
-// Get testID and classID from URL parameters
-if (!isset($_GET['testID']) || !isset($_GET['classID'])) {
-    die("Error: Missing testID or classID.");
+// Get classID and testID from URL parameters
+if (!isset($_GET['classID']) || !isset($_GET['testID'])) {
+    die("Error: Missing classID or testID.");
 }
-$testID = $_GET['testID'];
 $classID = $_GET['classID'];
+$testID = $_GET['testID'];
+
+// Process form submission if POST data is present
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
+    $studentID = $_POST['studentID'] ?? null;
+    $subjectID = $_POST['subjectID'] ?? null;
+    $grade = $_POST['grade'] ?? null;
+
+    // Validate all required fields are filled
+    if ($studentID && $subjectID && $grade !== null) {
+        // Insert the data into the results table
+        $insertQuery = "INSERT INTO results (studentID, testID, subjectID, grade) VALUES (?, ?, ?, ?)";
+        $stmt = $conn->prepare($insertQuery);
+
+        if ($stmt === false) {
+            die('Error: ' . htmlspecialchars($conn->error));
+        }
+
+        $stmt->bind_param("iiii", $studentID, $testID, $subjectID, $grade);
+        if ($stmt->execute()) {
+            echo "Marks added successfully!";
+            // Redirect to dashboard or any other page
+            header("location: dashboard.php");
+            exit();
+        } else {
+            echo "Error: " . htmlspecialchars($stmt->error);
+        }
+
+        $stmt->close();
+    } else {
+        echo "Error: All fields are required.";
+    }
+}
 
 // Function to fetch students based on classID
 function fetchStudents($conn, $classID) {
     $students = [];
-    $studentQuery = "SELECT s.studentID, s.student_Fname, s.student_Lname 
-                     FROM students s
-                     JOIN class_students cs ON s.studentID = cs.studentID
-                     WHERE cs.classID = ?";
+    $studentQuery = "SELECT studentID, fname, lname FROM students WHERE classID = ?";
     $stmt = $conn->prepare($studentQuery);
     $stmt->bind_param("i", $classID);
     $stmt->execute();
@@ -37,13 +67,13 @@ function fetchStudents($conn, $classID) {
 // Function to fetch subjects assigned to the logged-in teacher
 function fetchSubjects($conn, $staffID) {
     $subjects = [];
-    $subjectQuery = "SELECT DISTINCT subject FROM teacher_assignments WHERE staffID = ?";
+    $subjectQuery = "SELECT subjectID, subjectName FROM subjects WHERE subjectID IN (SELECT subjectID FROM teacher_assignment WHERE staffID = ?)";
     $stmt = $conn->prepare($subjectQuery);
     $stmt->bind_param("i", $staffID);
     $stmt->execute();
     $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) {
-        $subjects[] = $row['subject'];
+        $subjects[$row['subjectID']] = $row['subjectName'];
     }
     $stmt->close();
     return $subjects;
@@ -94,24 +124,24 @@ $conn->close();
     <div class="main" id="mainContent">
         <div class="container">
             <h2>Add Student Marks</h2>
-            <form action="process_marks.php" method="POST">
-                <!-- Hidden fields for testID and classID -->
-                <input type="hidden" name="testID" value="<?= htmlspecialchars($testID) ?>">
+            <form action="submit_marks.php?classID=<?= htmlspecialchars($classID) ?>&testID=<?= htmlspecialchars($testID) ?>" method="POST">
+                <!-- Hidden fields for classID and staffID -->
                 <input type="hidden" name="classID" value="<?= htmlspecialchars($classID) ?>">
+                <input type="hidden" name="staffID" value="<?= htmlspecialchars($staffID) ?>">
 
                 <div class="form-group">
                     <label for="studentID">Student Name:</label>
                     <select name="studentID" id="studentID" required>
                         <?php foreach ($students as $student): ?>
-                            <option value="<?= htmlspecialchars($student['studentID']) ?>"><?= htmlspecialchars($student['student_Fname'] . ' ' . $student['student_Lname']) ?></option>
+                            <option value="<?= htmlspecialchars($student['studentID']) ?>"><?= htmlspecialchars($student['fname'] . ' ' . $student['lname']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="subject">Subject:</label>
-                    <select name="subject" id="subject" required>
-                        <?php foreach ($subjects as $subject): ?>
-                            <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
+                    <label for="subjectID">Subject:</label>
+                    <select name="subjectID" id="subjectID" required>
+                        <?php foreach ($subjects as $subjectID => $subject): ?>
+                            <option value="<?= htmlspecialchars($subjectID) ?>"><?= htmlspecialchars($subject) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

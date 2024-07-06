@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <li><a href="register_student.php">Add Students</a></li>
                 <li><a href="register_teacher.php">Add Teachers</a></li>
                 <li><a href="teacher_assignments.php">Assign Teacher</a></li>
-                <li><a href="exam.php">Add Exam</a></li>
+                <li><a href="create_class.php">Create Class</a></li>
                 <li><a href="class_details.php">View Class</a></li>
                 <!-- Add more list items if needed -->
             </ul>
