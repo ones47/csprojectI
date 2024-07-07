@@ -1,6 +1,19 @@
 <?php
 // Include the database connection file
 include 'db_connect.php';
+session_start();
+
+// Start session
+session_start();
+
+// Check if user is logged in and is an administrator
+if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'administrator')) {
+    // Redirect to login page or error page
+    header("location: index.php"); // Redirect to your login page
+    exit;
+}
+
+$staffID = $_SESSION['staffID'];
 
 // Fetch distinct class years from the students table
 $class_years_query = "SELECT DISTINCT classID FROM students ORDER BY classID ASC";

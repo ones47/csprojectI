@@ -2,6 +2,18 @@
 // Include the database connection file
 include 'db_connect.php';
 
+// Start session
+session_start();
+
+// Check if user is logged in and is an administrator
+if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'administrator')) {
+    // Redirect to login page or error page
+    header("location: index.php"); // Redirect to your login page
+    exit;
+}
+
+$staffID = $_SESSION['staffID'];
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $username = $_POST['username'] ?? null;

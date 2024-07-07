@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION["loggedin"] = true;
                     $_SESSION["staffID"] = $id;
                     $_SESSION["username"] = $username;
-                    $_SESSION["designation"] = $designation;
+                    $_SESSION["designation"] = $designation; // Add designation to session
 
                     // Redirect based on designation
                     if ($designation == 'administrator') {

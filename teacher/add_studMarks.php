@@ -1,32 +1,20 @@
 <?php
 // Include database connection
 include '../db_connect.php';
+// Start session
 session_start();
 
-// Check if staffID is stored in session after login
-if (!isset($_SESSION['staffID'])) {
-    die("Session error: StaffID not found.");
+// Check if user is logged in and is an administrator
+if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'teacher')) {
+    // Redirect to login page or error page
+    header("location: ../index.php"); // Redirect to your login page
+    exit;
 }
 $staffID = $_SESSION['staffID'];
 
-// Function to fetch classes assigned to the logged-in teacher
-function fetchClasses($conn, $staffID) {
-    $classes = [];
-    $classQuery = "SELECT DISTINCT classID FROM teacher_assignment WHERE staffID = ?";
-    $stmt = $conn->prepare($classQuery);
-    $stmt->bind_param("i", $staffID);
-    $stmt->execute();
-    $classResult = $stmt->get_result();
-    while ($row = $classResult->fetch_assoc()) {
-        $classes[] = $row['classID'];
-    }
-    $stmt->close();
-    return $classes;
-}
-
-// Function to fetch test types assigned to the logged-in teacher
+// Function to fetch tests assigned to the logged-in teacher and are unfinished
 function fetchTests($conn, $staffID) {
-    $testQuery = "SELECT testID, testName FROM tests WHERE staffID = ?";
+    $testQuery = "SELECT testID, testName, classID FROM tests WHERE staffID = ? AND finished = 0";
     $testStmt = $conn->prepare($testQuery);
     $testStmt->bind_param("i", $staffID);
     $testStmt->execute();
@@ -43,8 +31,7 @@ function fetchTests($conn, $staffID) {
     return $tests;
 }
 
-// Fetch data
-$classes = fetchClasses($conn, $staffID);
+// Fetch tests assigned to the logged-in teacher
 $tests = fetchTests($conn, $staffID);
 
 // Close database connection
@@ -93,12 +80,8 @@ $conn->close();
             <h2>Add Student Marks</h2>
             <form action="submit_marks.php" method="GET">
                 <div class="form-group">
-                    <label for="classID">Student Class:</label>
-                    <select name="classID" id="classID" required>
-                        <?php foreach ($classes as $classID): ?>
-                            <option value="<?= htmlspecialchars($classID) ?>"><?= htmlspecialchars($classID) ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <!-- Hidden input to carry classID to submit_marks.php -->
+                    <input type="hidden" name="classID" id="classID" value="<?= isset($tests[0]['classID']) ? htmlspecialchars($tests[0]['classID']) : '' ?>">
                 </div>
                 <div class="form-group">
                     <label for="testID">Test Name:</label>

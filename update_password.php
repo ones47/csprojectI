@@ -1,8 +1,6 @@
 <?php
 // Include database connection
 include 'db_connect.php';
-session_start();
-
 // Start session
 session_start();
 
@@ -14,7 +12,31 @@ if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSIO
 }
 
 $staffID = $_SESSION['staffID'];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $newPassword = $_POST['newPassword'];
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+
+    // Update password in database
+    $updateQuery = "UPDATE users SET password = ? WHERE staffID = ?";
+    $stmt = $conn->prepare($updateQuery);
+    $stmt->bind_param("si", $hashedPassword, $staffID);
+    if ($stmt->execute()) {
+        echo "Password updated successfully.";
+    } else {
+        echo "Error updating password.";
+    }
+    $stmt->close();
+
+    // Redirect back to view account details
+    header("Location: account.php");
+    exit();
+}
+
+// Close the database connection
+$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,7 +74,16 @@ $staffID = $_SESSION['staffID'];
     </div>
 
     <div class="main" id="mainContent">
-        <!-- Add your main content here -->
+        <h2>Update Password</h2>
+        <form action="update_password.php" method="POST">
+            <div class="form-group">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Update Password</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>

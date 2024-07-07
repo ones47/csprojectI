@@ -1,11 +1,14 @@
 <?php
 // Include database connection
 include '../db_connect.php';
+// Start session
 session_start();
 
-// Check if staffID is stored in session after login
-if (!isset($_SESSION['staffID'])) {
-    die("Session error: StaffID not found.");
+// Check if user is logged in and is an administrator
+if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'teacher')) {
+    // Redirect to login page or error page
+    header("location: ../index.php"); // Redirect to your login page
+    exit;
 }
 $staffID = $_SESSION['staffID'];
 
@@ -152,6 +155,12 @@ if ($selectedClassID) {
                     </tr>
                 </thead>
                 <tbody>
+                    <?php
+                    // Initialize arrays to store total grades for each subject and overall grades
+                    $subjectTotals = array_fill_keys(array_column($subjects, 'subjectID'), 0);
+                    $totalGradesSum = 0;
+                    $studentCount = count($students);
+                    ?>
                     <?php foreach ($students as $student): ?>
                         <tr>
                             <td><?= htmlspecialchars($student['fname']) ?></td>
@@ -166,6 +175,7 @@ if ($selectedClassID) {
                                     $subjectID = $subject['subjectID'];
                                     $grade = $studentMarks[$subjectID] ?? 0;
                                     $totalGradeSum += $grade;
+                                    $subjectTotals[$subjectID] += $grade;
                                 ?>
                                 <td><?= htmlspecialchars($grade) ?></td>
                             <?php endforeach; ?>
@@ -184,7 +194,40 @@ if ($selectedClassID) {
                                 ?>
                             </td>
                         </tr>
+                        <?php $totalGradesSum += $averageGrade; ?>
                     <?php endforeach; ?>
+                    <tr>
+                        <td colspan="2"><strong>Subject Averages</strong></td>
+                        <?php foreach ($subjects as $subject): ?>
+                            <td><?= $studentCount > 0 ? round($subjectTotals[$subject['subjectID']] / $studentCount, 2) : 0 ?></td>
+                        <?php endforeach; ?>
+                        <td colspan="2"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="<?= 2 + count($subjects) ?>"><strong>Overall Class Average</strong></td>
+                        <td colspan="2">
+                            <?php
+                                $classAverage = $totalGradesSum / $studentCount;
+                                echo $classAverage;
+                            ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="<?= 2 + count($subjects) ?>"><strong>Overall Class Grade</strong></td>
+                        <td colspan="2">
+                            <?php
+                                if ($classAverage >= 76) {
+                                    echo 'EE';
+                                } elseif ($classAverage >= 51) {
+                                    echo 'ME';
+                                } elseif ($classAverage >= 26) {
+                                    echo 'AE';
+                                } else {
+                                    echo 'BE';
+                                }
+                            ?>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         <?php endif; ?>
