@@ -4,7 +4,7 @@ include '../db_connect.php';
 // Start session
 session_start();
 
-// Check if user is logged in and is an administrator
+// Check if user is logged in and is a teacher
 if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'teacher')) {
     // Redirect to login page or error page
     header("location: ../index.php"); // Redirect to your login page
@@ -80,14 +80,10 @@ $conn->close();
             <h2>Add Student Marks</h2>
             <form action="submit_marks.php" method="GET">
                 <div class="form-group">
-                    <!-- Hidden input to carry classID to submit_marks.php -->
-                    <input type="hidden" name="classID" id="classID" value="<?= isset($tests[0]['classID']) ? htmlspecialchars($tests[0]['classID']) : '' ?>">
-                </div>
-                <div class="form-group">
                     <label for="testID">Test Name:</label>
                     <select name="testID" id="testID" required>
                         <?php foreach ($tests as $test): ?>
-                            <option value="<?= $test['testID'] ?>"><?= $test['testName'] ?></option>
+                            <option value="<?= $test['testID'] ?>"><?= htmlspecialchars($test['testName']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

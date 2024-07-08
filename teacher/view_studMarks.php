@@ -106,6 +106,7 @@ $conn->close();
                 <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="add_studMarks.php">Add Student Grades</a></li>
                 <li><a href="view_classResults.php">Class Results</a></li>
+                <li><a href="subject_stats.php">Subject Statistics</a></li>
                 <li><a href="view_classStats.php">Class Statistics</a></li>
             </ul>
         </div>

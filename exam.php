@@ -3,9 +3,6 @@
 include 'db_connect.php';
 session_start();
 
-// Start session
-session_start();
-
 // Check if user is logged in and is an administrator
 if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'administrator')) {
     // Redirect to login page or error page
@@ -31,6 +28,14 @@ while ($row = mysqli_fetch_assoc($teacher_result)) {
     $teachers[] = $row['username'];
 }
 
+// Fetch exam names from the exams table
+$exam_query = "SELECT examID, examName FROM exams";
+$exam_result = mysqli_query($conn, $exam_query);
+$exams = [];
+while ($row = mysqli_fetch_assoc($exam_result)) {
+    $exams[] = ['examID' => $row['examID'], 'examName' => $row['examName']];
+}
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $test_name = $_POST['test_name'] ?? null;
@@ -38,9 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $teacher_username = $_POST['teacher_username'] ?? null;
     $term = $_POST['term'] ?? null;
     $yearOfTest = $_POST['yearOfTest'] ?? null;
+    $exam_id = $_POST['exam_id'] ?? null;
 
     // Validate all fields are filled
-    if ($test_name && $class_id && $teacher_username && $term && $yearOfTest) {
+    if ($test_name && $class_id && $teacher_username && $term && $yearOfTest && $exam_id) {
         // Get the staffID for the selected teacher
         $staff_query = "SELECT staffID FROM users WHERE username = ?";
         $stmt = $conn->prepare($staff_query);
@@ -62,9 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($subjectID) {
                 // Insert data into the tests table
-                $insert_query = "INSERT INTO tests (testName, classID, subjectID, staffID, term, yearOfTest) VALUES (?, ?, ?, ?, ?, ?)";
+                $insert_query = "INSERT INTO tests (testName, classID, subjectID, staffID, term, yearOfTest, examID) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($insert_query);
-                $stmt->bind_param("siiiii", $test_name, $class_id, $subjectID, $staffID, $term, $yearOfTest);
+                $stmt->bind_param("siiisii", $test_name, $class_id, $subjectID, $staffID, $term, $yearOfTest, $exam_id);
 
                 if ($stmt->execute()) {
                     echo "Test added successfully!";
@@ -112,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <li><a href="register_teacher.php">Add Teacher</a></li>
                 <li><a href="teacher_assignments.php">Assign Teacher</a></li>
                 <li><a href="create_class.php">Add New Class</a></li>
+                <li><a href="create_exam.php">Add Exam</a></li>
                 <li><a href="class_details.php">View Class</a></li>
                 <li><a href="view_exam.php">View Exam</a></li>
                 <li><a href="account.php">Account</a></li>
@@ -149,6 +156,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <select id="teacher_username" name="teacher_username" required>
                         <?php foreach ($teachers as $username) : ?>
                             <option value="<?= htmlspecialchars($username) ?>"><?= htmlspecialchars($username) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="exam_id">Exam:</label>
+                    <select id="exam_id" name="exam_id" required>
+                        <?php foreach ($exams as $exam) : ?>
+                            <option value="<?= htmlspecialchars($exam['examID']) ?>"><?= htmlspecialchars($exam['examName']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>

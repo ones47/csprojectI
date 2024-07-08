@@ -90,6 +90,7 @@ if ($selectedClassID) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Class Statistics</title>
     <link rel="stylesheet" href="../css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         table {
             width: 100%;
@@ -232,5 +233,6 @@ if ($selectedClassID) {
             </table>
         <?php endif; ?>
     </div>
+
 </body>
 </html>

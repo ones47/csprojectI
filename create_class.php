@@ -79,7 +79,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <li><a href="register_student.php">Add Students</a></li>
                 <li><a href="register_teacher.php">Add Teacher</a></li>
                 <li><a href="teacher_assignments.php">Assign Teacher</a></li>
-                <li><a href="exam.php">Add Exam</a></li>
+                <li><a href="create_exam.php">Add Exam</a></li>
+                <li><a href="exam.php">Add Test</a></li>
                 <li><a href="class_details.php">View Class</a></li>
                 <li><a href="view_exam.php">View Exam</a></li>
                 <li><a href="account.php">Account</a></li>

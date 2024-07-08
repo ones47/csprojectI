@@ -15,8 +15,8 @@ if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSIO
 
 $staffID = $_SESSION['staffID'];
 
-// Fetch distinct class years from the students table
-$class_years_query = "SELECT DISTINCT classID FROM students ORDER BY classID ASC";
+// Fetch distinct class years from the classes table
+$class_years_query = "SELECT DISTINCT classID FROM classes ORDER BY classID ASC";
 $class_years_result = mysqli_query($conn, $class_years_query);
 
 // Check for errors in the query
@@ -95,7 +95,8 @@ mysqli_close($conn);
                 <li><a href="register_teacher.php">Add Teacher</a></li>
                 <li><a href="teacher_assignments.php">Assign Teacher</a></li>
                 <li><a href="create_class.php">Add New Class</a></li>
-                <li><a href="exam.php">Add Exam</a></li>
+                <li><a href="create_exam.php">Add Exam</a></li>
+                <li><a href="exam.php">Add Test</a></li>
                 <li><a href="view_exam.php">View Exam</a></li>
                 <li><a href="account.php">Account</a></li>
                 <li><a href="view_teachers.php">View Teachers</a></li>
@@ -129,6 +130,7 @@ mysqli_close($conn);
                     <th>Last Name</th>
                     <th>Class</th>
                     <th>Date of Birth</th>
+                    <th>Action</th>
                     <!-- Add more columns if needed -->
                 </tr>
                 <?php foreach ($students as $student): ?>
@@ -137,10 +139,19 @@ mysqli_close($conn);
                         <td><?= htmlspecialchars($student['lname']) ?></td>
                         <td><?= htmlspecialchars($student['classID']) ?></td>
                         <td><?= htmlspecialchars($student['dob']) ?></td>
+                        <td>
+                            <!-- Update Form Button -->
+                            <form action="update_student.php" method="post">
+                                <input type="hidden" name="studentID" value="<?= $student['studentID'] ?>">
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
                         <!-- Add more columns if needed -->
                     </tr>
                 <?php endforeach; ?>
             </table>
+
+
 
             <!-- Download PDF Button -->
             <form action="generate_pdf.php" method="post">

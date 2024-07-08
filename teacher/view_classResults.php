@@ -35,6 +35,7 @@ $staffID = $_SESSION['staffID'];
                 <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="add_studMarks.php">Add Students Marks</a></li>
                 <li><a href="view_studMarks.php">View Student Marks</a></li>
+                <li><a href="subject_stats.php">Subject Statistics</a></li>
                 <li><a href="view_classStats.php">Class Statistics</a></li>
                 <!-- Add more list items if needed -->
             </ul>
