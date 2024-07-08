@@ -32,6 +32,7 @@ $staffID = $_SESSION['staffID'];
     <div class="sidebar" id="mySidebar">
         <div id="list-container">
             <ul>
+                <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="add_studMarks.php">Add Students Marks</a></li>
                 <li><a href="view_studMarks.php">View Student Marks</a></li>
                 <li><a href="view_classResults.php">Class Results</a></li>

@@ -41,6 +41,9 @@ $staffID = $_SESSION['staffID'];
                 <li><a href="create_class.php">Add New Class</a></li>
                 <li><a href="exam.php">Add Exam</a></li>
                 <li><a href="class_details.php">View Class</a></li>
+                <li><a href="view_exam.php">View Exam</a></li>
+                <li><a href="account.php">Account</a></li>
+                <li><a href="view_teachers.php">View Teachers</a></li>
                 <!-- Add more list items if needed -->
             </ul>
         </div>
