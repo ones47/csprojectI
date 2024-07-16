@@ -37,13 +37,13 @@ $staffID = $_SESSION['staffID'];
                 <li><a href="view_studMarks.php">View Student Marks</a></li>
                 <li><a href="subject_stats.php">Subject Statistics</a></li>
                 <li><a href="view_classStats.php">Class Statistics</a></li>
+                <li>
+                    <form action="../logout.php" method="POST">
+                        <button type="submit" class="logout-button">LOG OUT</button>
+                    </form>
+                </li>
                 <!-- Add more list items if needed -->
             </ul>
-        </div>
-        <div class="logout-button-container">
-            <form action="../logout.php" method="POST">
-                <button type="submit">LOG OUT</button>
-            </form>
         </div>
     </div>
 

@@ -79,15 +79,16 @@ $conn->close();
                 <li><a href="create_exam.php">Add Exam</a></li>
                 <li><a href="exam.php">Add Test</a></li>
                 <li><a href="class_details.php">View Class</a></li>
-                <li><a href="view_exam.php">View Exam</a></li>
+                <li><a href="adjust_exam.php">View Exams</a><li>
+                <li><a href="view_exam.php">View Tests</a></li>
                 <li><a href="account.php">Account</a></li>
+                <li>
+                    <form action="logout.php" method="POST">
+                        <button type="submit" class="logout-button">LOG OUT</button>
+                    </form>
+                </li>
                 <!-- Add more list items if needed -->
             </ul>
-        </div>
-        <div class="logout-button-container">
-            <form action="logout.php" method="POST">
-                <button type="submit">LOG OUT</button>
-            </form>
         </div>
     </div>
 

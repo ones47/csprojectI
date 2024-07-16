@@ -19,13 +19,13 @@ $staffID = $_SESSION['staffID'];
     <title>View Exams</title>
     <link rel="stylesheet" href="css/dashboard.css">
     <script>
-        function updateStatus(testID, currentStatus) {
+        function updateStatus(examID, status) {
             if (confirm("Are you sure you want to update the status?")) {
-                window.location.href = 'update_test_status.php?testID=' + testID + '&currentStatus=' + currentStatus;
+                window.location.href = 'update_exam_status.php?examID=' + examID + '&status=' + status;
             }
         }
 
-        function filterTests(filter) {
+        function filterExams(filter) {
             window.location.href = 'view_exam.php?filter=' + filter;
         }
     </script>
@@ -50,7 +50,7 @@ $staffID = $_SESSION['staffID'];
                 <li><a href="exam.php">Add Test</a></li>
                 <li><a href="class_details.php">View Class</a></li>
                 <li><a href="view_teachers.php">View Teachers</a></li>
-                <li><a href="adjust_exam.php">View Exams</a><li>
+                <li><a href="view_exam.php">View Tests</a></li>
                 <li><a href="account.php">Account</a></li>
                 <li>
                     <form action="logout.php" method="POST">
@@ -64,19 +64,9 @@ $staffID = $_SESSION['staffID'];
 
     <div class="main" id="mainContent">
         <h2>View Exams</h2>
-        <div class="filter-buttons">
-            <button onclick="filterTests('all')">All</button>
-            <button onclick="filterTests('ongoing')">Ongoing</button>
-            <button onclick="filterTests('done')">Done</button>
-        </div>
         <table border="1">
             <tr>
-                <th>Test Name</th>
-                <th>Teacher</th>
-                <th>Subject</th>
-                <th>Class</th>
-                <th>Term</th>
-                <th>Year</th>
+                <th>Exam Name</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -85,36 +75,33 @@ $staffID = $_SESSION['staffID'];
             // Include database connection
             include 'db_connect.php';
 
-            $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
-            $query = "SELECT t.testID, t.testName, t.classID, t.subjectID, t.staffID, t.term, t.yearOfTest, t.finished,
-                        s.subjectName, u.username
-                      FROM tests t
-                      JOIN subjects s ON t.subjectID = s.subjectID
-                      JOIN users u ON t.staffID = u.staffID";
-
-            if ($filter == 'ongoing') {
-                $query .= " WHERE t.finished = 0";
-            } elseif ($filter == 'done') {
-                $query .= " WHERE t.finished = 1";
-            }
-
-            $result = $conn->query($query);
+            // Fetch exams and their status
+            $examQuery = "
+                SELECT e.examID, e.examName, 
+                CASE WHEN COUNT(t.finished) = 0 THEN 'No tests'
+                     WHEN SUM(t.finished) = 0 THEN 'Ongoing'
+                     WHEN SUM(t.finished) = COUNT(t.finished) THEN 'Done'
+                     ELSE 'Mixed'
+                END as status
+                FROM exams e
+                LEFT JOIN tests t ON e.examID = t.examID
+                GROUP BY e.examID, e.examName
+            ";
+            $result = $conn->query($examQuery);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row['testName'] . "</td>";
-                    echo "<td>" . $row['username'] . "</td>";
-                    echo "<td>" . $row['subjectName'] . "</td>";
-                    echo "<td>" . $row['classID'] . "</td>";
-                    echo "<td>" . $row['term'] . "</td>";
-                    echo "<td>" . $row['yearOfTest'] . "</td>";
-                    echo "<td>" . ($row['finished'] == 1 ? 'Done' : 'Ongoing') . "</td>";
-                    echo "<td><button onclick=\"updateStatus(" . $row['testID'] . ", " . $row['finished'] . ")\">Update</button></td>";
+                    echo "<td>" . htmlspecialchars($row['examName']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['status']) . "</td>";
+                    echo "<td>
+                            <button onclick=\"updateStatus(" . $row['examID'] . ", 0)\">On</button>
+                            <button onclick=\"updateStatus(" . $row['examID'] . ", 1)\">Off</button>
+                          </td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='8'>No records found</td></tr>";
+                echo "<tr><td colspan='3'>No records found</td></tr>";
             }
 
             // Close connection

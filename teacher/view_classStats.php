@@ -23,6 +23,17 @@ function fetchClassYears($conn) {
     return $classYears;
 }
 
+// Fetch all exam names and IDs
+function fetchExams($conn) {
+    $exams = [];
+    $examQuery = "SELECT examID, examName FROM exams";
+    $result = $conn->query($examQuery);
+    while ($row = $result->fetch_assoc()) {
+        $exams[] = $row;
+    }
+    return $exams;
+}
+
 // Fetch student details for a specific class year
 function fetchStudents($conn, $classID) {
     $students = [];
@@ -49,16 +60,16 @@ function fetchSubjects($conn) {
     return $subjects;
 }
 
-// Fetch subject name and grade for a specific student
-function fetchStudentMarks($conn, $studentID) {
+// Fetch subject name and grade for a specific student and exam
+function fetchStudentMarks($conn, $studentID, $examID) {
     $marks = [];
     $markQuery = "
         SELECT r.subjectID, r.grade, s.subjectName 
         FROM results r
         JOIN subjects s ON r.subjectID = s.subjectID
-        WHERE r.studentID = ?";
+        WHERE r.studentID = ? AND r.examID = ?";
     $stmt = $conn->prepare($markQuery);
-    $stmt->bind_param("i", $studentID);
+    $stmt->bind_param("ii", $studentID, $examID);
     $stmt->execute();
     $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) {
@@ -70,12 +81,14 @@ function fetchStudentMarks($conn, $studentID) {
 
 // Fetch all class years and subjects
 $classYears = fetchClassYears($conn);
+$exams = fetchExams($conn); // Fetch exams here
 $subjects = fetchSubjects($conn); // Fetch subjects here
 
 // Handle form submission
 $selectedClassID = $_POST['classID'] ?? null;
+$selectedExamID = $_POST['examID'] ?? null;
 $students = [];
-if ($selectedClassID) {
+if ($selectedClassID && $selectedExamID) {
     $students = fetchStudents($conn, $selectedClassID);
 }
 
@@ -121,26 +134,40 @@ if ($selectedClassID) {
                 <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="add_studMarks.php">Add Student Grades</a></li>
                 <li><a href="view_studMarks.php">View Student Marks</a></li>
-                <li><a href="view_classResults.php">Class Results</a></li>
+                <li><a href="subject_stats.php">Subject Statistics</a><li>
+                <li>
+                    <form action="../logout.php" method="POST">
+                        <button type="submit" class="logout-button">LOG OUT</button>
+                    </form>
+                </li>
                 <!-- Add more list items if needed -->
             </ul>
-        </div>
-        <div class="logout-button-container">
-            <form action="../logout.php" method="POST">
-                <button type="submit">LOG OUT</button>
-            </form>
         </div>
     </div>
 
     <div class="main" id="mainContent">
         <h2>View Class Statistics</h2>
-        <div class="class-buttons">
-            <?php foreach ($classYears as $classYear): ?>
-                <form action="view_classStats.php" method="POST">
-                    <button type="submit" name="classID" value="<?= htmlspecialchars($classYear) ?>"><?= htmlspecialchars($classYear) ?></button>
-                </form>
-            <?php endforeach; ?>
-        </div>
+        <form action="view_classStats.php" method="POST">
+            <div class="form-group">
+                <label for="classID">Select Class Year:</label>
+                <select name="classID" id="classID" required>
+                    <option value="">Select Class Year</option>
+                    <?php foreach ($classYears as $classYear): ?>
+                        <option value="<?= htmlspecialchars($classYear) ?>"><?= htmlspecialchars($classYear) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="examID">Select Exam:</label>
+                <select name="examID" id="examID" required>
+                    <option value="">Select Exam</option>
+                    <?php foreach ($exams as $exam): ?>
+                        <option value="<?= htmlspecialchars($exam['examID']) ?>"><?= htmlspecialchars($exam['examName']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <button type="submit">View Statistics</button>
+        </form>
         
         <?php if (!empty($students)): ?>
             <table>
@@ -168,7 +195,7 @@ if ($selectedClassID) {
                             <td><?= htmlspecialchars($student['lname']) ?></td>
                             <?php
                                 $studentID = $student['studentID'];
-                                $studentMarks = fetchStudentMarks($conn, $studentID);
+                                $studentMarks = fetchStudentMarks($conn, $studentID, $selectedExamID);
                                 $totalGradeSum = 0;
                             ?>
                             <?php foreach ($subjects as $subject): ?>

@@ -19,12 +19,12 @@ if (!isset($_GET['testID'])) {
 }
 $testID = $_GET['testID'];
 
-// Fetch classID and subjectID using testID
-$query = "SELECT classID, subjectID FROM tests WHERE testID = ?";
+// Fetch classID, subjectID, and examID using testID
+$query = "SELECT classID, subjectID, examID FROM tests WHERE testID = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("i", $testID);
 $stmt->execute();
-$stmt->bind_result($classID, $subjectID);
+$stmt->bind_result($classID, $subjectID, $examID);
 $stmt->fetch();
 $stmt->close();
 
@@ -65,14 +65,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($count > 0) {
             // Update existing record
-            $updateQuery = "UPDATE results SET grade = ? WHERE studentID = ? AND testID = ?";
+            $updateQuery = "UPDATE results SET grade = ?, examID = ? WHERE studentID = ? AND testID = ?";
             $stmt = $conn->prepare($updateQuery);
-            $stmt->bind_param("iii", $grade, $studentID, $testID);
+            $stmt->bind_param("iiii", $grade, $examID, $studentID, $testID);
         } else {
             // Insert new record
-            $insertQuery = "INSERT INTO results (studentID, testID, subjectID, grade) VALUES (?, ?, ?, ?)";
+            $insertQuery = "INSERT INTO results (studentID, testID, subjectID, examID, grade) VALUES (?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($insertQuery);
-            $stmt->bind_param("iiii", $studentID, $testID, $subjectID, $grade);
+            $stmt->bind_param("iiiii", $studentID, $testID, $subjectID, $examID, $grade);
         }
 
         // Execute the statement
@@ -118,16 +118,15 @@ $conn->close();
             <ul>
                 <li><a href="add_studMarks.php">Add Students Marks</a></li>
                 <li><a href="view_studMarks.php">View Student Marks</a></li>
-                <li><a href="view_classResults.php">Class Results</a></li>
                 <li><a href="subject_stats.php">Subject Statistics</a></li>
                 <li><a href="view_classStats.php">Class Statistics</a></li>
+                <li>
+                    <form action="../logout.php" method="POST">
+                        <button type="submit" class="logout-button">LOG OUT</button>
+                    </form>
+                </li>
                 <!-- Add more list items if needed -->
             </ul>
-        </div>
-        <div class="logout-button-container">
-            <form action="../logout.php" method="POST">
-                <button type="submit">LOG OUT</button>
-            </form>
         </div>
     </div>
     <div class="main" id="mainContent">

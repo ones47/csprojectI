@@ -45,7 +45,7 @@ function fetchSubjects($conn, $staffID) {
 }
 
 // Fetch student marks based on classes and subjects assigned to the teacher
-function fetchStudentMarks($conn, $classID, $subjectID) {
+function fetchStudentMarks($conn, $classID, $subjectID, $staffID) {
     $students = [];
     if (!empty($classID) && !empty($subjectID)) {
         $marksQuery = "
@@ -54,9 +54,10 @@ function fetchStudentMarks($conn, $classID, $subjectID) {
             JOIN students s ON r.studentID = s.studentID
             JOIN classes c ON s.classID = c.classID
             JOIN subjects sub ON r.subjectID = sub.subjectID
-            WHERE s.classID = ? AND r.subjectID = ?";
+            JOIN tests t ON r.testID = t.testID
+            WHERE s.classID = ? AND r.subjectID = ? AND t.staffID = ? AND t.finished = 0";
         $stmt = $conn->prepare($marksQuery);
-        $stmt->bind_param("ii", $classID, $subjectID);
+        $stmt->bind_param("iii", $classID, $subjectID, $staffID);
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
@@ -76,7 +77,7 @@ $selectedClassID = $_POST['classID'] ?? null;
 $selectedSubjectID = $_POST['subjectID'] ?? null;
 $students = [];
 if ($selectedClassID && $selectedSubjectID) {
-    $students = fetchStudentMarks($conn, $selectedClassID, $selectedSubjectID);
+    $students = fetchStudentMarks($conn, $selectedClassID, $selectedSubjectID, $staffID);
 }
 
 // Close database connection
@@ -105,15 +106,14 @@ $conn->close();
             <ul>
                 <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="add_studMarks.php">Add Student Grades</a></li>
-                <li><a href="view_classResults.php">Class Results</a></li>
                 <li><a href="subject_stats.php">Subject Statistics</a></li>
                 <li><a href="view_classStats.php">Class Statistics</a></li>
+                <li>
+                    <form action="../logout.php" method="POST">
+                        <button type="submit" class="logout-button">LOG OUT</button>
+                    </form>
+                </li>
             </ul>
-        </div>
-        <div class="logout-button-container">
-            <form action="../logout.php" method="POST">
-                <button type="submit">LOG OUT</button>
-            </form>
         </div>
     </div>
     <div class="main" id="mainContent">

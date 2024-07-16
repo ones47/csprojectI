@@ -86,10 +86,7 @@ body {
                 }
 
 .logout-button-container {
-    position: absolute;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
+    padding-top: 30px; /* Adjust padding as needed */
 }
 
     .logout-button-container button {
@@ -100,6 +97,7 @@ body {
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        margin: 10px auto; /* Center the button horizontally with some margin */
     }
 
 .main {
@@ -184,4 +182,3 @@ button {
         #updateModal form button {
             margin-top: 10px;
         }
-
