@@ -135,6 +135,7 @@ if ($selectedClassID && $selectedExamID) {
                 <li><a href="add_studMarks.php">Add Student Grades</a></li>
                 <li><a href="view_studMarks.php">View Student Marks</a></li>
                 <li><a href="subject_stats.php">Subject Statistics</a><li>
+                <li><a href="account.php">Account</a></li>
                 <li>
                     <form action="../logout.php" method="POST">
                         <button type="submit" class="logout-button">LOG OUT</button>

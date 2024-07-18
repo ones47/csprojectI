@@ -4,37 +4,36 @@ include '../db_connect.php';
 // Start session
 session_start();
 
-// Check if user is logged in and is a teacher
+// Check if user is logged in and is an administrator
 if (!(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true && $_SESSION['designation'] === 'teacher')) {
     // Redirect to login page or error page
     header("location: ../index.php"); // Redirect to your login page
     exit;
 }
+
 $staffID = $_SESSION['staffID'];
 
-// Function to fetch tests assigned to the logged-in teacher and are unfinished
-function fetchTests($conn, $staffID) {
-    $testQuery = "SELECT testID, testName, classID FROM tests WHERE staffID = ? AND finished = 0";
-    $testStmt = $conn->prepare($testQuery);
-    $testStmt->bind_param("i", $staffID);
-    $testStmt->execute();
-    $testResult = $testStmt->get_result();
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $newPassword = $_POST['newPassword'];
+    $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
 
-    $tests = [];
-    while ($row = $testResult->fetch_assoc()) {
-        $tests[] = $row;
+    // Update password in database
+    $updateQuery = "UPDATE users SET password = ? WHERE staffID = ?";
+    $stmt = $conn->prepare($updateQuery);
+    $stmt->bind_param("si", $hashedPassword, $staffID);
+    if ($stmt->execute()) {
+        echo "Password updated successfully.";
+    } else {
+        echo "Error updating password.";
     }
+    $stmt->close();
 
-    // Close the statement
-    $testStmt->close();
-
-    return $tests;
+    // Redirect back to view account details
+    header("Location: account.php");
+    exit();
 }
 
-// Fetch tests assigned to the logged-in teacher
-$tests = fetchTests($conn, $staffID);
-
-// Close database connection
+// Close the database connection
 $conn->close();
 ?>
 
@@ -55,7 +54,6 @@ $conn->close();
         </div>
     </div>
     <!-- Topbar End-->
-
     <div class="sidebar" id="mySidebar">
         <div id="list-container">
             <ul>
@@ -76,21 +74,16 @@ $conn->close();
     </div>
 
     <div class="main" id="mainContent">
-        <!-- Add your main content here -->
-        <div class="container">
-            <h2>Add Student Marks</h2>
-            <form action="submit_marks.php" method="GET">
-                <div class="form-group">
-                    <label for="testID">Test Name:</label>
-                    <select name="testID" id="testID" required>
-                        <?php foreach ($tests as $test): ?>
-                            <option value="<?= $test['testID'] ?>"><?= htmlspecialchars($test['testName']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <button type="submit">Next</button>
-            </form>
-        </div>
+        <h2>Update Password</h2>
+        <form action="update_password.php" method="POST">
+            <div class="form-group">
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Update Password</button>
+            </div>
+        </form>
     </div>
 </body>
 </html>
