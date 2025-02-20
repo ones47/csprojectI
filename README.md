@@ -1,0 +1,1 @@
+The project is a school-based system meant for teachers and administrators. Administrators can add students and teachers to the database and assign them to their respective classes. Teachers can add student exam marks for their respective class as well as view compiled results and insights.
